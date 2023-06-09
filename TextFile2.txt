@@ -1,0 +1,9 @@
+void main()
+{
+setlocale(LC_ALL, "");
+
+cout << "Yello World";
+ofstream fout;
+fout.open("File.txt");
+fout<< "Hello World";
+}
