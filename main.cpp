@@ -1,4 +1,4 @@
-﻿﻿#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 #include<iostream>
 #include<fstream>
 #include<string>
@@ -364,7 +364,10 @@ Human** load(const std::string& filename, int& n)
 		for (n = 0; !fin.eof(); n++)
 		{
 			std::getline(fin, buffer);
-			if (buffer.empty())n--;
+			if (buffer.empty())
+			{
+				n--;
+			}
 		}
 
 		
@@ -391,7 +394,7 @@ Human** load(const std::string& filename, int& n)
 }
 
 //#define INHERITANCE_CHECK
-#define POLYMORPHISM
+//#define POLYMORPHISM
 #define LOAD_FROM_FILE
 void main()
 {
@@ -453,7 +456,6 @@ void main()
 		delete group[i];
 	}
 	delete[] group;
-	group = nullptr;
 #endif LOAD_FROM_FILE
 
 
