@@ -2,9 +2,7 @@
 #include<cmath>
 #include<Windows.h>
 #include<iostream>
-//using std::endl;
-//using std::cin;
-//using std::cout;
+
 using namespace std;
 
 #define delimiter "\n--------------------------------------\n"
@@ -32,7 +30,7 @@ namespace Geometry
 		MIN_LENGTH=20,
 		MAX_LENGTH=800
 	};
-	//static const double pi = 3.14;
+	
 #define SHAPE_TAKE_PARAMETERS   Color color, int start_x, int start_y, int line_width=5
 #define SHAPE_GIVE_PARAMETERS   color, start_x, start_y, line_width
 	class Shape
@@ -42,6 +40,7 @@ namespace Geometry
 		int start_x;
 		int start_y;
 		int line_width;
+		void (Shape::* draw_func) ()const;
 	public:
 		Shape(SHAPE_TAKE_PARAMETERS)
 		{
