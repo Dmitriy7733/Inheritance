@@ -40,7 +40,7 @@ namespace Geometry
 		int start_x;
 		int start_y;
 		int line_width;
-		void (Shape::* draw_func) ()const;
+		//void (Shape::* draw_func) ()const;
 	public:
 		Shape(SHAPE_TAKE_PARAMETERS)
 		{
@@ -48,6 +48,7 @@ namespace Geometry
 			set_start_x(start_x);
 			set_start_y(start_y);
 			set_line_width(line_width);
+			//draw_func = &Shape::draw;
 		}
 		
 		Color get_color()const
