@@ -33,6 +33,7 @@ namespace Geometry
 	
 #define SHAPE_TAKE_PARAMETERS   Color color, int start_x, int start_y, int line_width=5
 #define SHAPE_GIVE_PARAMETERS   color, start_x, start_y, line_width
+	//void default_draw(const Geometry::Shape& shape) { shape.draw(); }
 	class Shape
 	{
 	protected:
@@ -40,16 +41,11 @@ namespace Geometry
 		int start_x;
 		int start_y;
 		int line_width;
-		//void (Shape::* draw_func) ()const;
+		void (Shape::*draw_func)()const = &Shape::draw;
 	public:
-		Shape(SHAPE_TAKE_PARAMETERS)
-		{
-			set_color(color);
-			set_start_x(start_x);
-			set_start_y(start_y);
-			set_line_width(line_width);
-			//draw_func = &Shape::draw;
-		}
+		Shape(SHAPE_TAKE_PARAMETERS, void (Shape::*draw_func_param)()const = &Shape::draw) 
+		:color(color), start_x(start_x), start_y(start_y), line_width(line_width), draw_func(draw_func_param) {}
+		
 		
 		Color get_color()const
 		{
@@ -86,17 +82,35 @@ namespace Geometry
 		void set_line_width(int line_width)
 		{
 			if (line_width < Limits::MIN_LINE_WIDTH)line_width = Limits::MIN_LINE_WIDTH;
-			if (line_width > Limits::MAX_LINE_WIDTH)line_width = MAX_LINE_WIDTH;
+			if (line_width > Limits::MAX_LINE_WIDTH)line_width = Limits::MAX_LINE_WIDTH;
 			this->line_width = line_width;
 		}
 		virtual double get_area()const = 0;
 		virtual double get_perimiter()const = 0;
-		virtual void draw()const = 0;
+		void draw()const
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+
+			HPEN hPen = CreatePen(PS_SOLID, 5, color);
+
+			HBRUSH hBrush = CreateSolidBrush(color);
+
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+			draw_object(hdc);
+			DeleteObject(hPen);
+			DeleteObject(hBrush);
+
+			ReleaseDC(hwnd, hdc);
+
+		}
+		virtual void draw_object(HDC hdc)const = 0;
 		virtual void info()const
 		{
 			cout << "Площадь фигуры: " << get_area() << endl;
 			cout << "Периметр фигуры: " << get_perimiter() << endl;
-			draw();
+			(this->*draw_func)();
 		}
 	};
 
@@ -188,24 +202,10 @@ namespace Geometry
 		{
 			return sqrt(width * width + length * length);
 		}
-		void draw()const
+		void draw_object(HDC hdc)const override
 		{
-			HWND hwnd = GetConsoleWindow();
-			HDC hdc = GetDC(hwnd);
-
-			HPEN hPen = CreatePen(PS_SOLID, 5, color);
-
-			HBRUSH hBrush = CreateSolidBrush(color);
-
-			SelectObject(hdc, hPen);
-			SelectObject(hdc, hBrush);
-
+			
 			::Rectangle(hdc, start_x, start_y, start_x+width, start_y+length);
-
-			DeleteObject(hPen);
-			DeleteObject(hBrush);
-
-			ReleaseDC(hwnd, hdc);
 
 		}
 		void info()const
@@ -253,24 +253,10 @@ namespace Geometry
 		{
 			return 2 * M_PI * radius;
 		}
-		void draw()const
+		void draw_object(HDC hdc)const override
 		{
-			HWND hwnd = GetConsoleWindow();
-			HDC hdc = GetDC(hwnd);
-
-			HPEN hPen = CreatePen(PS_SOLID, line_width,color);
-
-			HBRUSH hBrush = CreateSolidBrush(color);
-
-			SelectObject(hdc, hPen);
-			SelectObject(hdc, hBrush);
-
+			
 			::Ellipse(hdc,start_x, start_y, start_x + get_diameter(), start_y + get_diameter());
-
-			DeleteObject(hPen);
-			DeleteObject(hBrush);
-
-			ReleaseDC(hwnd, hdc);
 
 		}
 		void info()const
@@ -324,18 +310,9 @@ namespace Geometry
 		{
 			return 3 * side;
 		}
-		void draw()const
+		void draw_object(HDC hdc)const override
 		{
-			HWND hwnd = GetConsoleWindow();
-			HDC hdc = GetDC(hwnd);
-
-			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
-
-			HBRUSH hBrush = CreateSolidBrush(color);
-
-			SelectObject(hdc, hPen);
-			SelectObject(hdc, hBrush);
-
+			
 			POINT vertex[] =
 			{
 				{start_x, start_y + side},
@@ -344,11 +321,6 @@ namespace Geometry
 			};
 
 			::Polygon(hdc, vertex, 3);
-
-			DeleteObject(hPen);
-			DeleteObject(hBrush);
-
-			ReleaseDC(hwnd, hdc);
 
 		}
 	};
@@ -395,17 +367,9 @@ namespace Geometry
 		{
 			return base + 2 * side;
 		}
-		void draw()const
+		void draw_object(HDC hdc)const override
 		{
-			HWND hwnd = GetConsoleWindow();
-			HDC hdc = GetDC(hwnd);
-
-			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
-			HBRUSH hBrush = CreateSolidBrush(color);
-
-			SelectObject(hdc, hPen);
-			SelectObject(hdc, hBrush);
-
+			
 			POINT vertex[] =
 			{
 				{ start_x, start_y + side },
@@ -414,11 +378,7 @@ namespace Geometry
 			};
 
 			::Polygon(hdc, vertex, 3);
-
-			DeleteObject(hPen);
-			DeleteObject(hBrush);
-
-			ReleaseDC(hwnd, hdc);
+			
 		}
 		void info()const
 		{
